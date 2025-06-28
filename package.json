@@ -1,0 +1,44 @@
+{
+  "name": "telemetrics-app",
+  "version": "1.0.0",
+  "description": "**Prerequisites** - Node.js (v18 or higher) - npm (latest version) - Docker - Turborepo ------------",
+  "main": "index.js",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobstefan773/telemetrics-app.git"
+  },
+  "packageManager": "npm@11.4.1",
+  "workspaces": [
+    "apps/*"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jobstefan773/telemetrics-app/issues"
+  },
+  "homepage": "https://github.com/jobstefan773/telemetrics-app#readme",
+  "devDependencies": {
+    "supabase": "^2.23.4",
+    "turbo": "^2.5.3"
+  },
+  "dependencies": {
+    "@nestjs/mapped-types": "*",
+    "@tanstack/react-query": "^5.80.7",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.511.0",
+    "next-themes": "^0.4.6",
+    "react-simple-maps": "^3.0.0",
+    "tailwind-merge": "^3.3.0",
+    "tw-animate-css": "^1.3.0"
+  }
+}
