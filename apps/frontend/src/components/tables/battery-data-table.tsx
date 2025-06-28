@@ -9,13 +9,11 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-  type DragEndEvent,
   type UniqueIdentifier,
 } from "@dnd-kit/core";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import {
   SortableContext,
-  arrayMove,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -42,33 +40,20 @@ import {
   ChevronsLeftIcon,
   ChevronsRightIcon,
   ColumnsIcon,
-  GripVerticalIcon,
-  LoaderIcon,
   MoreVerticalIcon,
-  TrendingUpIcon,
 } from "lucide-react";
 
 import { z } from "zod";
 
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -77,17 +62,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Table,
   TableBody,
@@ -96,7 +70,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const batterySchema = z.object({
   vin: z.string(),
@@ -138,13 +111,24 @@ const columns: ColumnDef<z.infer<typeof batterySchema>>[] = [
     accessorKey: "b_last_conn",
     header: "Last Connected",
     cell: ({ row }) => {
-      const dt = new Date(row.original.b_last_conn);
+      const dt = row.original.b_last_conn
+        ? new Date(row.original.b_last_conn)
+        : null;
       return (
         <div>
-          {dt.toLocaleDateString()}{" "}
-          <span className='text-xs text-muted-foreground'>
-            {dt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-          </span>
+          {dt && !isNaN(dt.getTime()) ? (
+            <>
+              {dt.toLocaleDateString()}{" "}
+              <span className='text-xs text-muted-foreground'>
+                {dt.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </>
+          ) : (
+            <span className='text-muted-foreground'>-</span>
+          )}
         </div>
       );
     },
@@ -153,8 +137,26 @@ const columns: ColumnDef<z.infer<typeof batterySchema>>[] = [
     accessorKey: "b_release_date",
     header: "Release Date",
     cell: ({ row }) => {
-      const dt = new Date(row.original.b_release_date);
-      return <div>{dt.toLocaleDateString()}</div>;
+      const dt = row.original.b_release_date
+        ? new Date(row.original.b_release_date)
+        : null;
+      return (
+        <div>
+          {dt && !isNaN(dt.getTime()) ? (
+            <>
+              {dt.toLocaleDateString()}{" "}
+              <span className='text-xs text-muted-foreground'>
+                {dt.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </>
+          ) : (
+            <span className='text-muted-foreground'>-</span>
+          )}
+        </div>
+      );
     },
   },
   {
@@ -256,17 +258,6 @@ export function DataTable({ data }: { data: z.infer<typeof batterySchema>[] }) {
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id);
-        const newIndex = dataIds.indexOf(over.id);
-        return arrayMove(data, oldIndex, newIndex);
-      });
-    }
-  }
-
   return (
     <div className='flex w-full flex-col justify-start gap-6'>
       <div className='flex items-center justify-between px-4 lg:px-6'>
@@ -309,7 +300,6 @@ export function DataTable({ data }: { data: z.infer<typeof batterySchema>[] }) {
           <DndContext
             collisionDetection={closestCenter}
             modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
             sensors={sensors}
             id={sortableId}
           >
